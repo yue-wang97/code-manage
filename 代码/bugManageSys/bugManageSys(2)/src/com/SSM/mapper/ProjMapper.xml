@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.SSM.mapper.ProjMapper">
+	
+	<resultMap type="proj" id="projMap">
+		
+		<!-- 主键映射 -->
+		<id column="proj_id" property="proj_id"></id>
+		
+		<!--property:user类中对象的名字  -->
+		<!--javaType:该对象的类型  -->
+		<association property="user" javaType="user">
+			<id column="user_id" property="user_id"></id>
+		</association>
+	</resultMap>
+	
+	<!-- 检索全部项目信息 -->
+	<select id="queryAllProjs"  resultMap="projMap">
+		select b.*,u.* from proj_list b,bug_user u where b.user_id=u.user_id
+	</select>
+	
+	<!-- 添加项目 -->
+	<insert id="addProj" parameterType="proj">
+		insert into proj_list values(#{user.user_id},proj_index.nextval,#{keyword},#{proj_name},#{proj_info},
+		      #{s_date},#{manager})
+	</insert>
+
+
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.SSM.mapper.BugMapper">
+
+	<resultMap type="bug" id="bugMap">
+		<!-- 主键映射 -->
+		<id column="bug_id" property="bug_id"></id>
+		
+		
+		<!-- 添加映射对象 -->
+		<!--property:bug类中对象的名字  -->
+		<!--javaType:该对象的类型  -->
+		
+		<association property="proj" javaType="proj">
+			<id column="proj_id" property="proj_id"></id>
+		</association>
+		<association property="user" javaType="user">
+			<id column="user_id" property="user_id"></id>
+		</association>
+		
+		<association property="bug_type" javaType="bug_type">
+			<id column="type_id" property="type_id"></id>
+		</association>
+		
+		<association property="bug_status" javaType="bug_status">
+			<id column="status_id" property="status_id"></id>
+		</association>
+	</resultMap>
+	
+	
+	<!-- 检索全部信息 -->
+	<select id="queryAllBugs"  resultMap="bugMap">	
+   select b.*,  u.type_name,  a.status_name,   w.*,   v.*,t.*,x.*
+   from bug_list b,  bug_type u,  bug_status a,  proj_list w,  bug_user v, proj_list t,  bug_user x
+     where b.type_id=u.type_id and b.status_id=a.status_id  and b.proj_id=w.proj_id 
+     and b.user_id=v.user_id    and t.user_id=x.user_id and b.proj_id=t.proj_id
+	</select>
+	
+	<!-- 添加bug -->
+	  <insert id="addBug" parameterType="bug">
+	  
+insert into bug_list values(#{proj.proj_id},bug_index.nextval,#{bugname},#{maker},
+#{user.user_id},#{bug_type.type_id},#{bug_status.status_id},#{solve},#{existdate},#{solvedate})
+
+	 </insert>	
+		    
+	<!-- 删除bug -->
+	<delete id="deletBug" parameterType="bug">
+		delete from bug_list where bug_id=#{bug_id}
+	</delete>
+	
+	
+	<!-- 按条件搜索 -->
+	<select id="queryBugByItems" parameterType="bug" resultMap="bugMap">
+		select b.*,  u.type_name,  a.status_name,   w.*,   v.*
+   from bug_list b,  bug_type u,  bug_status a,  proj_list w,  bug_user v
+     where b.type_id=u.type_id and b.status_id=a.status_id  and b.proj_id=w.proj_id and b.user_id=v.user_id 
+     		 and bug_id= ${bug_id} 
+	</select>
+	
+	<!-- 按PRO_ID搜索 -->
+	<sql id="sqll">
+	  <if test="proj_id!=0">
+	   and b.proj_id=#{proj_id}
+	  </if>
+	</sql>
+	<select id="queryBugByP" parameterType="proj" resultMap="bugMap">
+		   select b.*,  u.type_name,  a.status_name,   w.*,   v.*
+   from bug_list b,  bug_type u,  bug_status a,  proj_list w,  bug_user v
+     where b.type_id=u.type_id and b.status_id=a.status_id  and b.proj_id=w.proj_id and b.user_id=v.user_id 
+     	 and b.proj_id= ${proj_id} 
+		<include refid="sqll"></include>
+	</select>
+	
+	<!-- 按user_ID搜索 -->
+	<sql id="sqlll">
+	  <if test="user_id!=0">
+	   and b.user_id=#{user_id}
+	  </if>
+	</sql>
+	<select id="queryBugByU" parameterType="user" resultMap="bugMap">
+		   select b.*,  u.type_name,  a.status_name,   w.*,   v.*
+   from bug_list b,  bug_type u,  bug_status a,  proj_list w,  bug_user v
+     where b.type_id=u.type_id and b.status_id=a.status_id  and b.proj_id=w.proj_id and b.user_id=v.user_id 
+     	 and b.user_id= ${user_id} 
+		<include refid="sqlll"></include>
+	</select>
+	
+	<!-- 统计问题数量 -->
+	<select id="countbugs"  resultMap="bugMap">	
+ select b.*,  u.type_name,  a.status_name,   w.*,   v.userName
+   from bug_list b,  bug_type u,  bug_status a,  proj_list w,  bug_user v
+     where b.type_id=u.type_id and b.status_id=a.status_id  and b.proj_id=w.proj_id 
+     and b.user_id=v.user_id    
+	</select>
+	
+</mapper>
